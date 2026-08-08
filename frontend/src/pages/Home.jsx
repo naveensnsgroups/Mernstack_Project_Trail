@@ -150,7 +150,7 @@ export default function Home() {
         className="text-center py-6 text-xs text-gray-400 border-t border-gray-200 mt-8"
         style={{ fontFamily: 'Poppins, sans-serif' }}
       >
-        HR Personal Details System &middot; MERN Stack + Tailwind CSS
+        HR Personal Details System &middot; SNS IHUB
       </footer>
 
       {/* ── Modals ──────────────────────────────────────────────── */}
