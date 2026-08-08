@@ -19,12 +19,18 @@ const app = express();
 // Set secure HTTP headers
 app.use(helmet());
 
-// Restrict CORS to allowed frontend origin only
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',');
+// Restrict CORS to allowed frontend origin only (strips trailing slashes automatically)
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((url) => url.trim().replace(/\/$/, ''));
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. mobile apps, curl, Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+    
+    const cleanOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
