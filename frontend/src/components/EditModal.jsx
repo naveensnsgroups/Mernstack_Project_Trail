@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { X, Save, Loader2, Pencil, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { updateEmployee } from '../services/api';
+import { validateWithZod } from '../utils/employeeSchema';
 
 const DEPARTMENTS = ['IT', 'HR', 'Finance', 'Marketing', 'Operations', 'Sales', 'Admin', 'Other'];
 const GENDERS     = ['Male', 'Female', 'Other'];
@@ -9,8 +10,8 @@ const GENDERS     = ['Male', 'Female', 'Other'];
 const FIELDS = [
   { name: 'fullName',    label: 'Full Name',           type: 'text',  placeholder: 'e.g. John Doe' },
   { name: 'employeeId',  label: 'Employee ID',          type: 'text',  placeholder: 'e.g. EMP001' },
-  { name: 'email',       label: 'Email Address',        type: 'email', placeholder: 'john@company.com' },
-  { name: 'phone',       label: 'Phone Number',         type: 'tel',   placeholder: '+91 9876543210' },
+  { name: 'email',       label: 'Email Address',        type: 'email', placeholder: 'name@snsgroups.com' },
+  { name: 'phone',       label: 'Phone Number',         type: 'tel',   placeholder: '9876543210 (10 digits)' },
   { name: 'dateOfBirth', label: 'Date of Birth',        type: 'date' },
   { name: 'position',    label: 'Position / Job Title', type: 'text',  placeholder: 'Software Engineer' },
   { name: 'joinDate',    label: 'Join Date',            type: 'date' },
@@ -19,16 +20,6 @@ const FIELDS = [
 const formatDateForInput = (dateStr) => {
   if (!dateStr) return '';
   return new Date(dateStr).toISOString().split('T')[0];
-};
-
-const validate = (formData) => {
-  const errors = {};
-  if (!formData.fullName?.trim())   errors.fullName   = 'Full name is required';
-  if (!formData.employeeId?.trim()) errors.employeeId = 'Employee ID is required';
-  if (!formData.email?.trim())      errors.email      = 'Email is required';
-  else if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = 'Invalid email format';
-  if (!formData.phone?.trim())      errors.phone      = 'Phone is required';
-  return errors;
 };
 
 const inputCls = (hasError) =>
@@ -71,11 +62,26 @@ export default function EditModal({ employee, onClose, onUpdated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate(formData);
-    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
+
+    // Zod Schema Validation
+    const validation = validateWithZod(formData);
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      return;
+    }
+
     setLoading(true);
     try {
-      await updateEmployee(employee._id, formData);
+      const sanitizedData = {
+        ...formData,
+        fullName:   validation.data.fullName,
+        employeeId: validation.data.employeeId,
+        email:      validation.data.email,
+        phone:      validation.data.phone,
+        position:   validation.data.position || '',
+        address:    validation.data.address || '',
+      };
+      await updateEmployee(employee._id, sanitizedData);
       toast.success('Employee updated successfully!');
       onUpdated();
       onClose();

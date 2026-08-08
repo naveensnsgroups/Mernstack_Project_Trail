@@ -13,7 +13,14 @@ const ALLOWED_FIELDS = [
  */
 const pickFields = (body) => {
   return ALLOWED_FIELDS.reduce((acc, key) => {
-    if (body[key] !== undefined) acc[key] = body[key];
+    if (body[key] !== undefined && body[key] !== null) {
+      if (typeof body[key] === 'string') {
+        const trimmed = body[key].trim();
+        acc[key] = key === 'email' ? trimmed.toLowerCase() : trimmed;
+      } else {
+        acc[key] = body[key];
+      }
+    }
     return acc;
   }, {});
 };

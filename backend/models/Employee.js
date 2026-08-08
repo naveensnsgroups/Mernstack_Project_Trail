@@ -7,6 +7,7 @@ const employeeSchema = new mongoose.Schema(
       required: [true, 'Full name is required'],
       trim: true,
       maxlength: [100, 'Full name cannot exceed 100 characters'],
+      match: [/^[A-Za-z\s]+$/, 'Full name must contain only letters and spaces (no numbers or special characters)'],
     },
     employeeId: {
       type: String,
@@ -14,7 +15,7 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       maxlength: [20, 'Employee ID cannot exceed 20 characters'],
-      match: [/^[A-Za-z0-9-_]+$/, 'Employee ID must be alphanumeric'],
+      match: [/^EMP\d+$/, 'Employee ID must start with EMP in capital letters followed by numbers (e.g. EMP001)'],
     },
     email: {
       type: String,
@@ -23,14 +24,14 @@ const employeeSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       maxlength: [150, 'Email cannot exceed 150 characters'],
-      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
+      match: [/^[a-z0-9._%+-]+@snsgroups\.com$/, 'Email must be in lowercase and end with @snsgroups.com domain'],
     },
     phone: {
       type: String,
       required: [true, 'Phone number is required'],
       trim: true,
-      maxlength: [20, 'Phone number cannot exceed 20 characters'],
-      match: [/^[+\d][\d\s\-()\\.]{6,19}$/, 'Please provide a valid phone number'],
+      maxlength: [10, 'Phone number cannot exceed 10 digits'],
+      match: [/^\d{10}$/, 'Phone number must be exactly 10 digits (numbers only)'],
     },
     dateOfBirth: {
       type: Date,
