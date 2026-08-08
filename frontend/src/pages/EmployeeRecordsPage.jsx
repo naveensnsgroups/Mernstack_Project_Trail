@@ -78,22 +78,20 @@ export default function EmployeeRecordsPage() {
           </div>
         </div>
 
-        {/* Highly Visible High-Contrast Stat Cards */}
+        {/* Clean Stat Cards — No harsh black border box lines */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="bg-white border-2 border-black p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
+              <div key={stat.label} className="bg-gray-50 border border-gray-200 p-5">
+                <div className="flex items-center justify-between mb-2">
                   <span
                     className="text-xs font-bold text-gray-900 uppercase tracking-wider"
                     style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
                     {stat.label}
                   </span>
-                  <div className="w-7 h-7 bg-black text-white flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-3.5 h-3.5" />
-                  </div>
+                  <Icon className="w-4 h-4 text-gray-600" />
                 </div>
                 <p
                   className="text-3xl font-extrabold text-gray-900"
