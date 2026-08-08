@@ -1,16 +1,18 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
+import AddEmployeePage from './pages/AddEmployeePage';
+import EmployeeRecordsPage from './pages/EmployeeRecordsPage';
 
 /**
- * App.jsx — Router configuration only.
- * All page content lives in src/pages/.
- * Add new routes here as the project grows.
+ * App.jsx — Multi-page client-side router
+ * - /         : Add New Employee Form Page
+ * - /records  : Employee Records List Page
  */
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<AddEmployeePage />} />
+        <Route path="/records" element={<EmployeeRecordsPage />} />
       </Routes>
     </BrowserRouter>
   );
