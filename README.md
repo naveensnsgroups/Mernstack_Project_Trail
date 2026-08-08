@@ -87,7 +87,7 @@ It features a **pure white design system**, **sharp-cornered black action contro
   - **Update**: Edit existing employee details via an accessible modal.
   - **Delete**: Double-confirmation deletion modal with auto-focused cancel safety button.
 - **Interactive Department Analytics**:
-  - Live counters for Total Employees, IT Department, HR Department, and Other Departments.
+  - Live counters for Total Employees, IT Department, HR Department, and Other Departments (clean, soft-bordered UI).
 - **Accessibility & UX**:
   - ARIA attributes (`aria-label`, `aria-modal`, `role="dialog"`).
   - Modal keyboard listeners (`Escape` key closes modals).
@@ -139,12 +139,41 @@ Validation is performed on **both client (React)** and **server (Express Middlew
 
 ## 📊 Lines of Code (LOC) Breakdown
 
-| Component Layer | Files Count | Total Lines of Code |
+| Layer | File Count | Lines of Code (LOC) |
 |---|---|---|
-| **Frontend UI (React + Tailwind)** | 13 files | **907 lines** |
-| **Backend API (Express + Mongoose)** | 8 files | **380 lines** |
-| **Documentation & Configs** | 1 file | **147 lines** |
-| **GRAND TOTAL** | **22 files** | **1,434 lines** |
+| **Frontend UI (React + Tailwind)** | 15 files | **1,054 lines** |
+| **Backend API (Express + Mongoose + Zod)** | 9 files | **443 lines** |
+| **Documentation (`README.md`)** | 1 file | **347 lines** |
+| **TOTAL WORKSPACE** | **25 files** | **1,844 lines** |
+
+### Detailed File-by-File LOC Matrix
+
+| File Path | Purpose | LOC |
+|---|---|---|
+| `frontend/src/components/PersonalDetailsForm.jsx` | Add Employee Form with live typing filters & Flag | **288** |
+| `frontend/src/components/EditModal.jsx` | Edit Modal component with Zod validation | **272** |
+| `backend/controllers/employeeController.js` | Whitelisted RESTful CRUD business logic | **148** |
+| `frontend/src/pages/EmployeeRecordsPage.jsx` | `/records` Dashboard & Stat Counters | **138** |
+| `frontend/src/components/EmployeeTable.jsx` | Employee Records Table | **131** |
+| `frontend/src/components/ConfirmDeleteModal.jsx` | Deletion confirmation modal | **106** |
+| `backend/server.js` | Express entry point with security middleware | **101** |
+| `backend/models/Employee.js` | Mongoose Schema (Collection: `HR`) | **72** |
+| `frontend/src/components/Navbar.jsx` | Navigation Header with active tab styling | **62** |
+| `frontend/src/pages/AddEmployeePage.jsx` | `/` Page component | **47** |
+| `frontend/index.html` | Entry HTML with Tailwind CDN & Poppins font | **46** |
+| `frontend/src/utils/employeeSchema.js` | Frontend Zod schema validator | **44** |
+| `backend/middleware/validateEmployee.js` | Backend Express Zod payload validator | **43** |
+| `frontend/src/main.jsx` | React root entry & Toast config | **33** |
+| `frontend/package.json` | Client dependencies | **29** |
+| `frontend/src/services/api.js` | Axios client & global interceptor | **26** |
+| `backend/package.json` | Server dependencies | **23** |
+| `backend/routes/employeeRoutes.js` | Express route mapping with Zod middleware | **21** |
+| `frontend/src/App.jsx` | React Router shell | **20** |
+| `backend/config/db.js` | MongoDB Atlas connection logic | **19** |
+| `backend/.env.example` | Environment template | **11** |
+| `frontend/src/index.css` | Base CSS resets | **7** |
+| `backend/.env` | Secret environment config | **5** |
+| `frontend/vercel.json` | Vercel SPA routing rewrite config | **5** |
 
 ---
 
