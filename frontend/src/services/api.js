@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Uses VITE_API_URL in production, fallback to '/api/employees' for local development via Vite proxy
+const BASE_URL = import.meta.env.VITE_API_URL || '/api/employees';
+
 const api = axios.create({
-  baseURL: '/api/employees',
+  baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -10,10 +13,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (!error.response) {
-      // Network error — server unreachable
       return Promise.reject(new Error('Network error. Please check your connection.'));
     }
-    // Pass through HTTP errors so components can read error.response.data
     return Promise.reject(error);
   }
 );
