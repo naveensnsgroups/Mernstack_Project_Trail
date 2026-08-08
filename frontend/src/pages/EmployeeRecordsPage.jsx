@@ -78,18 +78,28 @@ export default function EmployeeRecordsPage() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Highly Visible High-Contrast Stat Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="bg-white border border-gray-200 p-5">
-                <Icon className="w-5 h-5 text-gray-400 mb-3" />
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <div key={stat.label} className="bg-white border-2 border-black p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span
+                    className="text-xs font-bold text-gray-900 uppercase tracking-wider"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    {stat.label}
+                  </span>
+                  <div className="w-7 h-7 bg-black text-white flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <p
+                  className="text-3xl font-extrabold text-gray-900"
+                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                >
                   {stat.value}
-                </p>
-                <p className="text-xs text-gray-400 font-medium mt-0.5" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {stat.label}
                 </p>
               </div>
             );
