@@ -13,17 +13,6 @@ const initialState = {
   department: '', position: '', joinDate: '',
 };
 
-const FIELDS = [
-  { name: 'fullName',    label: 'Full Name',           type: 'text',  placeholder: 'e.g. John Doe',           required: true },
-  { name: 'employeeId',  label: 'Employee ID',          type: 'text',  placeholder: 'e.g. EMP001',              required: true },
-  { name: 'email',       label: 'Email Address',        type: 'email', placeholder: 'name@snsgroups.com',      required: true },
-  { name: 'phone',       label: 'Phone Number',         type: 'tel',   placeholder: '9876543210 (10 digits)',   required: true },
-  { name: 'dateOfBirth', label: 'Date of Birth',        type: 'date' },
-  { name: 'position',    label: 'Position / Job Title', type: 'text',  placeholder: 'e.g. Software Engineer' },
-  { name: 'joinDate',    label: 'Join Date',            type: 'date' },
-];
-
-// Shared input class
 const inputCls = (hasError) =>
   `w-full border ${hasError ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'} px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-black transition-colors font-sans`;
 
@@ -34,7 +23,23 @@ export default function PersonalDetailsForm({ onEmployeeAdded }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    if (name === 'fullName') {
+      // 1. Only letters and single spaces (no numbers, symbols, or consecutive spaces)
+      formattedValue = value.replace(/[^A-Za-z\s]/g, '').replace(/\s{2,}/g, ' ');
+    } else if (name === 'employeeId') {
+      // 2. Auto-uppercase Employee ID, alphanumeric only
+      formattedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    } else if (name === 'phone') {
+      // 3. Only digits allowed, strictly maximum 10 digits
+      formattedValue = value.replace(/[^\d]/g, '').slice(0, 10);
+    } else if (name === 'email') {
+      // 4. Auto-lowercase email, remove spaces
+      formattedValue = value.toLowerCase().replace(/\s/g, '');
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -54,12 +59,12 @@ export default function PersonalDetailsForm({ onEmployeeAdded }) {
     try {
       const sanitizedData = {
         ...formData,
-        fullName:   validation.data.fullName,
-        employeeId: validation.data.employeeId,
-        email:      validation.data.email,
-        phone:      validation.data.phone,
-        position:   validation.data.position || '',
-        address:    validation.data.address || '',
+        fullName:   validation.data.fullName.trim(),
+        employeeId: validation.data.employeeId.trim(),
+        email:      validation.data.email.trim().toLowerCase(),
+        phone:      validation.data.phone.trim(),
+        position:   validation.data.position ? validation.data.position.trim() : '',
+        address:    validation.data.address  ? validation.data.address.trim()  : '',
       };
       await createEmployee(sanitizedData);
       toast.success('Employee added successfully!');
@@ -86,26 +91,123 @@ export default function PersonalDetailsForm({ onEmployeeAdded }) {
       <form onSubmit={handleSubmit} noValidate className="p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-4">
 
-          {FIELDS.map((field) => (
-            <div key={field.name}>
-              <label htmlFor={field.name} className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                {field.label}{field.required && <span className="text-red-500 ml-0.5">*</span>}
-              </label>
+          {/* Full Name */}
+          <div>
+            <label htmlFor="fullName" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Full Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="e.g. John Doe (letters only)"
+              aria-invalid={!!errors.fullName}
+              className={inputCls(!!errors.fullName)}
+            />
+            {errors.fullName && (
+              <p role="alert" className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+            )}
+          </div>
+
+          {/* Employee ID */}
+          <div>
+            <label htmlFor="employeeId" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Employee ID <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="employeeId"
+              type="text"
+              name="employeeId"
+              value={formData.employeeId}
+              onChange={handleChange}
+              placeholder="e.g. EMP001 (auto-caps)"
+              aria-invalid={!!errors.employeeId}
+              className={inputCls(!!errors.employeeId)}
+            />
+            {errors.employeeId && (
+              <p role="alert" className="text-red-500 text-xs mt-1">{errors.employeeId}</p>
+            )}
+          </div>
+
+          {/* Email Address */}
+          <div>
+            <label htmlFor="email" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Email Address <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="name@snsgroups.com"
+              aria-invalid={!!errors.email}
+              className={inputCls(!!errors.email)}
+            />
+            {errors.email && (
+              <p role="alert" className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Phone Number with Country Flag Badge */}
+          <div>
+            <label htmlFor="phone" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-0 top-0 bottom-0 px-3 bg-gray-100 border-r border-gray-300 flex items-center gap-1.5 text-xs font-semibold text-gray-600 select-none">
+                <span className="text-sm">🇮🇳</span>
+                <span>+91</span>
+              </div>
               <input
-                id={field.name}
-                type={field.type}
-                name={field.name}
-                value={formData[field.name]}
+                id="phone"
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
-                placeholder={field.placeholder}
-                aria-invalid={!!errors[field.name]}
-                className={inputCls(!!errors[field.name])}
+                placeholder="9876543210 (10 digits only)"
+                maxLength={10}
+                aria-invalid={!!errors.phone}
+                className={`${inputCls(!!errors.phone)} pl-20`}
               />
-              {errors[field.name] && (
-                <p role="alert" className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
-              )}
             </div>
-          ))}
+            {errors.phone && (
+              <p role="alert" className="text-red-500 text-xs mt-1">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Date of Birth */}
+          <div>
+            <label htmlFor="dateOfBirth" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Date of Birth
+            </label>
+            <input
+              id="dateOfBirth"
+              type="date"
+              name="dateOfBirth"
+              value={formData.dateOfBirth}
+              onChange={handleChange}
+              className={inputCls(false)}
+            />
+          </div>
+
+          {/* Position */}
+          <div>
+            <label htmlFor="position" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Position / Job Title
+            </label>
+            <input
+              id="position"
+              type="text"
+              name="position"
+              value={formData.position}
+              onChange={handleChange}
+              placeholder="e.g. Software Engineer"
+              className={inputCls(false)}
+            />
+          </div>
 
           {/* Gender */}
           <div>
@@ -135,6 +237,21 @@ export default function PersonalDetailsForm({ onEmployeeAdded }) {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
+          </div>
+
+          {/* Join Date */}
+          <div>
+            <label htmlFor="joinDate" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Join Date
+            </label>
+            <input
+              id="joinDate"
+              type="date"
+              name="joinDate"
+              value={formData.joinDate}
+              onChange={handleChange}
+              className={inputCls(false)}
+            />
           </div>
 
           {/* Address */}

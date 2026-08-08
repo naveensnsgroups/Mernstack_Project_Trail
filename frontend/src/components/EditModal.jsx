@@ -7,16 +7,6 @@ import { validateWithZod } from '../utils/employeeSchema';
 const DEPARTMENTS = ['IT', 'HR', 'Finance', 'Marketing', 'Operations', 'Sales', 'Admin', 'Other'];
 const GENDERS     = ['Male', 'Female', 'Other'];
 
-const FIELDS = [
-  { name: 'fullName',    label: 'Full Name',           type: 'text',  placeholder: 'e.g. John Doe' },
-  { name: 'employeeId',  label: 'Employee ID',          type: 'text',  placeholder: 'e.g. EMP001' },
-  { name: 'email',       label: 'Email Address',        type: 'email', placeholder: 'name@snsgroups.com' },
-  { name: 'phone',       label: 'Phone Number',         type: 'tel',   placeholder: '9876543210 (10 digits)' },
-  { name: 'dateOfBirth', label: 'Date of Birth',        type: 'date' },
-  { name: 'position',    label: 'Position / Job Title', type: 'text',  placeholder: 'Software Engineer' },
-  { name: 'joinDate',    label: 'Join Date',            type: 'date' },
-];
-
 const formatDateForInput = (dateStr) => {
   if (!dateStr) return '';
   return new Date(dateStr).toISOString().split('T')[0];
@@ -56,7 +46,23 @@ export default function EditModal({ employee, onClose, onUpdated }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    if (name === 'fullName') {
+      // Letters and single spaces only
+      formattedValue = value.replace(/[^A-Za-z\s]/g, '').replace(/\s{2,}/g, ' ');
+    } else if (name === 'employeeId') {
+      // Auto-uppercase Employee ID, alphanumeric
+      formattedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    } else if (name === 'phone') {
+      // Digits only, max 10
+      formattedValue = value.replace(/[^\d]/g, '').slice(0, 10);
+    } else if (name === 'email') {
+      // Lowercase, no spaces
+      formattedValue = value.toLowerCase().replace(/\s/g, '');
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -74,12 +80,12 @@ export default function EditModal({ employee, onClose, onUpdated }) {
     try {
       const sanitizedData = {
         ...formData,
-        fullName:   validation.data.fullName,
-        employeeId: validation.data.employeeId,
-        email:      validation.data.email,
-        phone:      validation.data.phone,
-        position:   validation.data.position || '',
-        address:    validation.data.address || '',
+        fullName:   validation.data.fullName.trim(),
+        employeeId: validation.data.employeeId.trim(),
+        email:      validation.data.email.trim().toLowerCase(),
+        phone:      validation.data.phone.trim(),
+        position:   validation.data.position ? validation.data.position.trim() : '',
+        address:    validation.data.address  ? validation.data.address.trim()  : '',
       };
       await updateEmployee(employee._id, sanitizedData);
       toast.success('Employee updated successfully!');
@@ -119,24 +125,120 @@ export default function EditModal({ employee, onClose, onUpdated }) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6" noValidate>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
-            {FIELDS.map((field) => (
-              <div key={field.name}>
-                <label htmlFor={`edit-${field.name}`} className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                  {field.label}
-                </label>
+
+            {/* Full Name */}
+            <div>
+              <label htmlFor="edit-fullName" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="edit-fullName"
+                type="text"
+                name="fullName"
+                value={formData.fullName || ''}
+                onChange={handleChange}
+                placeholder="e.g. John Doe"
+                className={inputCls(!!errors.fullName)}
+              />
+              {errors.fullName && (
+                <p role="alert" className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+              )}
+            </div>
+
+            {/* Employee ID */}
+            <div>
+              <label htmlFor="edit-employeeId" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Employee ID <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="edit-employeeId"
+                type="text"
+                name="employeeId"
+                value={formData.employeeId || ''}
+                onChange={handleChange}
+                placeholder="e.g. EMP001"
+                className={inputCls(!!errors.employeeId)}
+              />
+              {errors.employeeId && (
+                <p role="alert" className="text-red-500 text-xs mt-1">{errors.employeeId}</p>
+              )}
+            </div>
+
+            {/* Email Address */}
+            <div>
+              <label htmlFor="edit-email" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="edit-email"
+                type="email"
+                name="email"
+                value={formData.email || ''}
+                onChange={handleChange}
+                placeholder="name@snsgroups.com"
+                className={inputCls(!!errors.email)}
+              />
+              {errors.email && (
+                <p role="alert" className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Phone Number with Country Flag Badge */}
+            <div>
+              <label htmlFor="edit-phone" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <div className="relative flex items-center">
+                <div className="absolute left-0 top-0 bottom-0 px-3 bg-gray-100 border-r border-gray-300 flex items-center gap-1.5 text-xs font-semibold text-gray-600 select-none">
+                  <span className="text-sm">🇮🇳</span>
+                  <span>+91</span>
+                </div>
                 <input
-                  id={`edit-${field.name}`}
-                  type={field.type} name={field.name}
-                  value={formData[field.name] || ''}
+                  id="edit-phone"
+                  type="tel"
+                  name="phone"
+                  value={formData.phone || ''}
                   onChange={handleChange}
-                  placeholder={field.placeholder}
-                  className={inputCls(!!errors[field.name])}
+                  placeholder="9876543210 (10 digits)"
+                  maxLength={10}
+                  className={`${inputCls(!!errors.phone)} pl-20`}
                 />
-                {errors[field.name] && (
-                  <p role="alert" className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
-                )}
               </div>
-            ))}
+              {errors.phone && (
+                <p role="alert" className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Date of Birth */}
+            <div>
+              <label htmlFor="edit-dateOfBirth" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Date of Birth
+              </label>
+              <input
+                id="edit-dateOfBirth"
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth || ''}
+                onChange={handleChange}
+                className={inputCls(false)}
+              />
+            </div>
+
+            {/* Position */}
+            <div>
+              <label htmlFor="edit-position" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Position / Job Title
+              </label>
+              <input
+                id="edit-position"
+                type="text"
+                name="position"
+                value={formData.position || ''}
+                onChange={handleChange}
+                placeholder="Software Engineer"
+                className={inputCls(false)}
+              />
+            </div>
 
             {/* Gender */}
             <div>
@@ -162,6 +264,21 @@ export default function EditModal({ employee, onClose, onUpdated }) {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
+            </div>
+
+            {/* Join Date */}
+            <div>
+              <label htmlFor="edit-joinDate" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Join Date
+              </label>
+              <input
+                id="edit-joinDate"
+                type="date"
+                name="joinDate"
+                value={formData.joinDate || ''}
+                onChange={handleChange}
+                className={inputCls(false)}
+              />
             </div>
 
             {/* Address */}
