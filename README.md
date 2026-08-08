@@ -8,10 +8,15 @@ Developed for **SNS IHUB**.
 
 ## 📋 Table of Contents
 - [Overview](#-overview)
+- [Live Deployment Links](#-live-deployment-links)
 - [Architecture & System Flow](#-architecture--system-flow)
 - [Key Features](#-key-features)
 - [Real-Time Input Transformations & UX](#-real-time-input-transformations--ux)
 - [Dual-Layer Zod Validation Schema](#-dual-layer-zod-validation-schema)
+- [PII Data Protection & Encryption Standards](#-pii-data-protection--encryption-standards)
+- [Lines of Code (LOC) Breakdown](#-lines-of-code-loc-breakdown)
+- [Free Hosting & Deployment Guide](#-free-hosting--deployment-guide)
+- [Sample Test Records](#-sample-test-records)
 - [Tech Stack & Dependencies](#-tech-stack--dependencies)
 - [Directory Structure](#-directory-structure)
 - [Installation & Setup Guide](#-installation--setup-guide)
@@ -30,6 +35,14 @@ It features a **pure white design system**, **sharp-cornered black action contro
 
 ---
 
+## 🚀 Live Deployment Links
+
+- **Frontend Client (Vercel)**: [`https://mernstack-project-trail.vercel.app/`](https://mernstack-project-trail.vercel.app/)
+- **Backend API (Render)**: [`https://sns-hr-backend.onrender.com/api/employees`](https://sns-hr-backend.onrender.com/api/employees)
+- **Database (MongoDB Atlas Cloud)**: `Code_Migration_HR_Trail` -> Collection `HR`
+
+---
+
 ## 🏗 Architecture & System Flow
 
 ```
@@ -38,7 +51,7 @@ It features a **pure white design system**, **sharp-cornered black action contro
                                   | (React 18 + Vite SPA) |
                                   +-----------+-----------+
                                               |
-                                              |  HTTP / REST (Axios + Zod)
+                                              |  HTTPS / TLS 1.3 (Axios + Zod)
                                               v
                                   +-----------+-----------+
                                   |     Express Server    |
@@ -52,7 +65,7 @@ It features a **pure white design system**, **sharp-cornered black action contro
                                   | (Field Whitelisting)  |
                                   +-----------+-----------+
                                               |
-                                              |  Mongoose ODM
+                                              |  Mongoose ODM (AES-256)
                                               v
                                   +-----------+-----------+
                                   |     MongoDB Atlas     |
@@ -109,6 +122,73 @@ Validation is performed on **both client (React)** and **server (Express Middlew
 | `phone` | `string` | Yes | `^\d{10}$` | *Phone number must be exactly 10 digits* |
 | `department` | `enum` | No | `IT, HR, Finance, Marketing, Operations, Sales, Admin, Other` | *Invalid department option* |
 | `gender` | `enum` | No | `Male, Female, Other` | *Invalid gender option* |
+
+---
+
+## 🔐 PII Data Protection & Encryption Standards
+
+1. **Encryption in Transit (HTTPS / TLS 1.3)**:
+   - All network payloads between client, Express backend, and MongoDB Atlas are encrypted over **TLS 1.3 / SSL HTTPS**.
+2. **Encryption at Rest (MongoDB Atlas AES-256)**:
+   - Cloud storage disks are encrypted with hardware-level **AES-256 bit encryption**.
+3. **GDPR / Privacy Compliance Rights**:
+   - **Right to Rectification**: Employee details can be modified at any time via `/records`.
+   - **Right to Erasure**: Complete deletion supported via confirmation modal.
+
+---
+
+## 📊 Lines of Code (LOC) Breakdown
+
+| Component Layer | Files Count | Total Lines of Code |
+|---|---|---|
+| **Frontend UI (React + Tailwind)** | 13 files | **907 lines** |
+| **Backend API (Express + Mongoose)** | 8 files | **380 lines** |
+| **Documentation & Configs** | 1 file | **147 lines** |
+| **GRAND TOTAL** | **22 files** | **1,434 lines** |
+
+---
+
+## ☁️ Free Hosting & Deployment Guide
+
+### Backend (Render Web Service)
+1. Sign up on **[Render.com](https://render.com)** -> Connect GitHub repo.
+2. Select Root Directory: `backend` | Build Command: `npm install` | Start Command: `npm start`.
+3. Set Environment Variables:
+   - `MONGO_URI`: `mongodb+srv://pf01:pf01@productfactory01.tqhycwe.mongodb.net/Code_Migration_HR_Trail?retryWrites=true&w=majority`
+   - `CLIENT_URL`: `https://mernstack-project-trail.vercel.app`
+   - `PORT`: `5000` | `NODE_ENV`: `production`
+
+### Frontend (Vercel Static Site)
+1. Sign up on **[Vercel.com](https://vercel.com)** -> Import GitHub repo.
+2. Select Root Directory: `frontend` | Framework: `Vite` | Output: `dist`.
+3. Set Environment Variable:
+   - `VITE_API_URL`: `https://sns-hr-backend.onrender.com/api/employees`
+
+---
+
+## 🧪 Sample Test Records
+
+```json
+{
+  "fullName": "Naveen Kumar",
+  "employeeId": "EMP101",
+  "email": "naveen@snsgroups.com",
+  "phone": "9876543210",
+  "department": "IT",
+  "position": "Software Engineer"
+}
+```
+
+```json
+{
+  "fullName": "Priya Sharma",
+  "employeeId": "EMP102",
+  "email": "priya@snsgroups.com",
+  "phone": "9123456789",
+  "department": "HR",
+  "position": "HR Manager"
+}
+```
 
 ---
 
